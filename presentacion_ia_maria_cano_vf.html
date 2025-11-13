@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integración de IA - Fundación Universitaria María Cano</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0a0e27;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Fondo animado con partículas */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(30, 58, 138, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(233, 30, 99, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 20%, rgba(76, 175, 80, 0.2) 0%, transparent 50%);
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .slide {
+            width: 95%;
+            max-width: 1400px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+            padding: 50px 70px;
+            display: none;
+            flex-direction: column;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            animation: slideReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideReveal {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Encabezado minimalista */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(233, 30, 99, 0.2);
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+        }
+
+        .slide-counter {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+            background: rgba(233, 30, 99, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        /* Tipografía moderna */
+        h1 {
+            color: #1e3a8a;
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            color: #e91e63;
+            font-size: 2em;
+            margin: 30px 0 20px 0;
+            font-weight: 700;
+        }
+
+        h3 {
+            color: #4caf50;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+            font-weight: 600;
+        }
+
+        p, li {
+            color: #333;
+            font-size: 1.05em;
+            line-height: 1.7;
+            margin-bottom: 12px;
+            font-weight: 400;
+        }
+
+        /* Cards modernas con glassmorphism */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(233, 30, 99, 0.9), rgba(194, 24, 91, 0.9));
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(233, 30, 99, 0.3);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(233, 30, 99, 0.4);
+        }
+
+        .stat-number {
+            font-size: 4em;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        /* Tabla moderna */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 25px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 18px 20px;
+            text-align: left;
+            font-size: 1.05em;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            background: white;
+            transition: background 0.3s;
+        }
+
+        tr:hover td {
+            background: rgba(233, 30, 99, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Gráficos de barras modernos */
+        .chart-container {
+            margin: 35px 0;
+            padding: 30px;
+            background: rgba(245, 245, 245, 0.5);
+            border-radius: 20px;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .bar-label {
+            min-width: 220px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .bar {
+            flex: 1;
+            background: rgba(200, 200, 200, 0.3);
+            border-radius: 10px;
+            height: 35px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e3a8a, #4f87ff);
+            border-radius: 10px;
+            transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.95em;
+            box-shadow: 0 2px 10px rgba(30, 58, 138, 0.3);
+        }
+
+        /* Cajas destacadas */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(200, 230, 201, 0.2));
+            border-left: 5px solid #4caf50;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(76, 175, 80, 0.1);
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 224, 178, 0.2));
+            border-left: 5px solid #ff9800;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(255, 152, 0, 0.1);
+        }
+
+        /* Botones de navegación flotantes */
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 16px 35px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-prev {
+            background: linear-gradient(135deg, #666, #888);
+            color: white;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #e91e63, #c2185b);
+            color: white;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Tarjetas de recomendaciones */
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .recommendation-card {
+            background: white;
+            border: 2px solid rgba(233, 30, 99, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recommendation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #e91e63, #4caf50);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(233, 30, 99, 0.2);
+            border-color: #e91e63;
+        }
+
+        .recommendation-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .recommendation-number {
+            background: linear-gradient(135deg, #e91e63, #c2185b);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.3);
+        }
+
+        /* Slide de portada */
+        .intro-slide {
+            text-align: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.05), rgba(233, 30, 99, 0.05));
+        }
+
+        .intro-slide h1 {
+            font-size: 4.5em;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #1e3a8a, #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .intro-slide .subtitle {
+            font-size: 1.8em;
+            color: #e91e63;
+            margin-bottom: 50px;
+            font-weight: 600;
+        }
+
+        /* Pills decorativas */
+        .pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 25px 0;
+            justify-content: center;
+        }
+
+        .pill {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1em;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .pill:hover {
+            transform: scale(1.1);
+        }
+
+        /* Scrollbar personalizado */
+        .slide::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .slide::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .slide::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #e91e63, #4caf50);
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px 25px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            .intro-slide h1 {
+                font-size: 2.8em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .title h1 {
+            font-size: 4em;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .title p {
+            font-size: 1.5em;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .modules-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+            position: relative;
+            align-items: start;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease-out backwards;
+            position: relative;
+        }
+
+        .module-card:nth-child(1) {
+            animation-delay: 0.2s;
+            margin-top: 0;
+        }
+
+        .module-card:nth-child(2) {
+            animation-delay: 0.4s;
+            margin-top: 80px;
+        }
+
+        /* Arrow connecting modules */
+        .arrow-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .arrow {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .arrow svg {
+            width: 60%;
+            height: 60%;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .module-3 {
+            border-top: 6px solid #00acc1;
+        }
+
+        .module-4 {
+            border-top: 6px solid #ff6f00;
+        }
+
+        .module-card h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .module-3 h2 {
+            color: #00838f;
+        }
+
+        .module-4 h2 {
+            color: #e65100;
+        }
+
+        .module-card h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .module-3 h3 {
+            color: #00acc1;
+        }
+
+        .module-4 h3 {
+            color: #ff6f00;
+        }
+
+        .duration {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .module-3 .duration {
+            background: linear-gradient(135deg, #00acc1 0%, #00838f 100%);
+        }
+
+        .module-4 .duration {
+            background: linear-gradient(135deg, #ff6f00 0%, #e65100 100%);
+        }
+
+        .module-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .module-card li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #424242;
+            font-size: 1.05em;
+            line-height: 1.5;
+            transition: transform 0.2s ease;
+        }
+
+        .module-card li:hover {
+            transform: translateX(5px);
+        }
+
+        .module-card li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .module-3 li:before {
+            color: #00acc1;
+        }
+
+        .module-4 li:before {
+            color: #ff6f00;
+        }
+
+        .module-card li strong {
+            font-weight: 700;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .modules-container {
+                grid-template-columns: 1fr;
+            }
+
+            .module-card:nth-child(2) {
+                margin-top: 30px;
+            }
+
+            .arrow-container {
+                display: none;
+            }
+
+            .title h1 {
+                font-size: 3em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+
+            .title h1 {
+                font-size: 2.5em;
+            }
+
+            .title p {
+                font-size: 1.2em;
+            }
+
+            .module-card {
+                padding: 20px;
+            }
+
+            .module-card h2 {
+                font-size: 1.6em;
+            }
+
+            .module-card h3 {
+                font-size: 1.1em;
+            }
+
+            .module-card li {
+                font-size: 0.95em;
+            }
+        }
+        .final-module-card {
+    margin-top: 30px;
+    padding: 25px;
+    border-radius: 20px;
+
+    background: linear-gradient(135deg, #667eea22, #764ba222);
+    border: 2px solid #764ba266;
+
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+
+    display: flex;
+    justify-content: center;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+.final-module-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+}
+
+.final-text h2 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #4a4a4a;
+}
+
+.final-text p {
+    font-size: 16px;
+    color: #333;
+    max-width: 600px;
+}
+
+.final-icon img {
+    width: 120px;
+    height: auto;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    transition: 0.3s ease;
+}
+
+.final-icon img:hover {
+    transform: scale(1.05);
+}
+
+/* Animación */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.game-image-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.game-image {
+    width: 90%;
+    max-width: 900px;
+    border-radius: 15px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.wonder-classroom {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+}
+
+.mosaic-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+    gap: 20px; /* espacio entre imágenes */
+    width: 100%; /* ajusta el ancho total del mosaico */
+}
+
+.mosaic-item {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.20);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden;
+}
+
+.mosaic-item img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain; /* No recorta y respeta tamaños */
+}
+
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="presentation-container">
+        <!-- Slide 1: Portada (Rediseñado) -->
+<div class="slide active intro-slide" style="background: white;">
+    <div class="header">
+        <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+        <span class="slide-counter">1 / 16</span>
+    </div>
+
+    <h1 style="text-align:center; font-size:3.8em; margin-bottom:10px;">
+        Integración de la Inteligencia Artificial
+    </h1>
+    <p style="
+        font-size:1.25em;
+        color:#333333;
+        text-align:center;
+        max-width:900px;
+        margin:0 auto 30px auto;
+        line-height:1.7;
+    ">
+        La <strong>Inteligencia Artificial (IA)</strong> impulsa la <strong>innovación pedagógica</strong>,
+        la <strong>analítica académica</strong> y el <strong>desarrollo de competencias digitales</strong>
+        en la Fundación Universitaria María Cano, fortaleciendo su compromiso con la
+        <strong>calidad y la excelencia formativa</strong>.
+    </p>
+
+    <!-- Bloque compacto de sedes -->
+    <div style="display:flex; justify-content:center; gap:40px; flex-wrap:wrap; margin-top:40px;">
+        <div style="text-align:center;">
+            <div style="width:90px; height:90px; border-radius:50%; background:linear-gradient(135deg,#1e3a8a,#4f87ff);
+                display:flex; align-items:center; justify-content:center; color:white; font-size:2em; margin:0 auto 10px auto;">
+                🏛️
+            </div>
+            <p style="font-weight:600; color:#1e3a8a;">Medellín</p>
+        </div>
+        <div style="text-align:center;">
+            <div style="width:90px; height:90px; border-radius:50%; background:linear-gradient(135deg,#4caf50,#81c784);
+                display:flex; align-items:center; justify-content:center; color:white; font-size:2em; margin:0 auto 10px auto;">
+                🌿
+            </div>
+            <p style="font-weight:600; color:#4caf50;">Neiva</p>
+        </div>
+        <div style="text-align:center;">
+            <div style="width:90px; height:90px; border-radius:50%; background:linear-gradient(135deg,#e91e63,#f06292);
+                display:flex; align-items:center; justify-content:center; color:white; font-size:2em; margin:0 auto 10px auto;">
+                💫
+            </div>
+            <p style="font-weight:600; color:#e91e63;">Popayán</p>
+        </div>
+        <div style="text-align:center;">
+            <div style="width:90px; height:90px; border-radius:50%; background:linear-gradient(135deg,#ff9800,#ffb74d);
+                display:flex; align-items:center; justify-content:center; color:white; font-size:2em; margin:0 auto 10px auto;">
+                🌅
+            </div>
+            <p style="font-weight:600; color:#ff9800;">Cali</p>
+        </div>
+    </div>
+
+    <!-- Cuadrícula de programas académicos -->
+    <div style="
+        margin-top:50px;
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+        gap:15px;
+        max-width:950px;
+        margin-left:auto;
+        margin-right:auto;
+    ">
+       
+        <div style="background:#4caf50; color:white; padding:12px; border-radius:12px; text-align:center; font-weight:600;">Psicología</div>
+        <div style="background:#e91e63; color:white; padding:12px; border-radius:12px; text-align:center; font-weight:600;">Fisioterapia</div>
+        <div style="background:#1e3a8a; color:white; padding:12px; border-radius:12px; text-align:center; font-weight:600;">Ingeniería de Software</div>
+        <div style="background:#ff9800; color:white; padding:12px; border-radius:12px; text-align:center; font-weight:600;">Fonoaudiología</div>
+        <div style="background:#2196f3; color:white; padding:12px; border-radius:12px; text-align:center; font-weight:600;">Administración</div>
+        <div style="background:#9c27b0; color:white; padding:12px; border-radius:12px; text-align:center; font-weight:600;">Contaduría</div>
+        <div style="background:#009688; color:white; padding:12px; border-radius:12px; text-align:center; font-weight:600;">Nutrición y Dietéticas</div>
+        <div style="background:#795548; color:white; padding:12px; border-radius:12px; text-align:center; font-weight:600;">Terapia Ocupacional</div>
+    </div>
+</div>
+
+        <!-- Slide 2: Introducción -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+                <span class="slide-counter">2 / 16</span>
+            </div>
+            <h1>📘 Introducción</h1>
+            <div class="highlight-box">
+                 La <strong>Inteligencia Artificial (IA)</strong> se ha convertido en un 
+    <strong>eje estratégico de innovación</strong> y una 
+    <strong>herramienta transformadora</strong> de los procesos de enseñanza, aprendizaje y gestión educativa en la 
+    <strong>Fundación Universitaria María Cano</strong>.  
+    Su integración impulsa la <strong>innovación pedagógica</strong>, la <strong>analítica académica</strong> 
+    y el <strong>desarrollo de competencias digitales</strong> en docentes y estudiantes, 
+    fortaleciendo el compromiso institucional con la <strong>calidad, la excelencia formativa</strong> 
+    y la <strong>educación del futuro</strong>.
+            </div>
+            <p style="margin-top: 30px; font-size: 1.15em;">Este informe presenta los <strong>resultados reales</strong> de las estrategias de incorporación de IA registradas en 2025, incluyendo su impacto en:</p>
+            <div class="pill-container">
+                <span class="pill">🎓 Docencia</span>
+                <span class="pill">🔬 Investigación</span>
+                <span class="pill">🏛️ Gestión Institucional</span>
+            </div>
+        </div>
+
+
+        <!-- Slide 5: Participación Institucional -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+                <span class="slide-counter">5 / 16</span>
+            </div>
+            <h1>🎯 Participación Institucional</h1>
+            <h2>Grado de Madurez Institucional</h2>
+            <table>
+                <tr>
+                    <th>Nivel</th>
+                    <th>Descripción</th>
+                    <th>Porcentaje</th>
+                </tr>
+                <tr>
+                    <td><strong>Inicial</strong></td>
+                    <td>Exploración del uso de herramientas IA</td>
+                    <td><strong>38%</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Intermedio</strong></td>
+                    <td>Integración formal en clases y prácticas</td>
+                    <td><strong>47%</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Avanzado</strong></td>
+                    <td>Estrategias replicables e institucionales</td>
+                    <td><strong>15%</strong></td>
+                </tr>
+            </table>
+
+             <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">24</span>
+                    <span class="stat-label">Programas Participantes</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">133</span>
+                    <span class="stat-label">Estrategias Registradas</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Tipología de Uso -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+                <span class="slide-counter">6 / 16</span>
+            </div>
+            <h1>🔧 Tipología de Uso de la IA</h1>
+            <table>
+                <tr>
+                    <th>Tipo de Uso</th>
+                    <th>Descripción</th>
+                    <th>Ejemplos</th>
+                </tr>
+                <tr>
+                    <td><strong>Docencia Asistida</strong></td>
+                    <td>ChatGPT, Copilot y Gemini para diseño de clases</td>
+                    <td>Ingeniería de Software, Psicología</td>
+                </tr>
+                <tr>
+                    <td><strong>Práctica Profesional</strong></td>
+                    <td>Simulaciones y análisis de casos</td>
+                    <td>Fisioterapia, Fonoaudiología</td>
+                </tr>
+                <tr>
+                    <td><strong>Evaluación Automatizada</strong></td>
+                    <td>Rúbrica y retroalimentación automática</td>
+                    <td>Ingeniería de Software, Psicología</td>
+                </tr>
+                <tr>
+                    <td><strong>Investigación Aplicada</strong></td>
+                    <td>Modelos predictivos y análisis de datos</td>
+                    <td>Ingeniería de Software, Innovación</td>
+                </tr>
+                 <tr>
+                    <td><strong>Gamificación y Aprendizaje Interactivo</strong></td>
+                    <td>Uso de entornos digitales y juegos educativos con IA para el desarrollo de competencias cognitivas y lógicas.</td>
+                    <td>Circuit Builder (CodeLogic Quest) – Ingeniería de Software</td>
+                </tr>
+            </table>
+        </div>
+
+
+        <!-- Slide 9: Lectura Estratégica -->
+        <div class="slide">
+            <div class="header">
+        <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+        <span class="slide-counter">8 / 16</span>
+    </div>
+
+    <h1>🧭 Lectura Estratégica Institucional</h1>
+
+    <p style="font-size:1.2em; text-align:center; color:#333; max-width:950px; margin:20px auto 40px auto; line-height:1.7;">
+        El análisis DOFA revela una institución en <strong>madurez intermedia hacia la innovación educativa</strong>,
+        con un ecosistema de docentes y programas que han adoptado la IA como parte de su práctica pedagógica.
+    </p>
+
+    <div style="
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    ">
+        <!-- Insight 1 -->
+        <div style="
+            background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(200,230,201,0.2));
+            border-left: 6px solid #4caf50;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        ">
+            <h3 style="color:#4caf50; margin-bottom:15px;">✅ Fortalezas + Oportunidades</h3>
+            <p style="font-size:1.05em; line-height:1.6; color:#333;">
+                Reflejan una <strong>madurez institucional creciente</strong> y la disposición de la comunidad académica 
+                para liderar la <strong>innovación educativa con IA</strong>.  
+                Existe una base sólida de experiencias, motivación docente y articulación intersede.
+            </p>
+        </div>
+
+        <!-- Insight 2 -->
+        <div style="
+            background: linear-gradient(135deg, rgba(255,193,7,0.1), rgba(255,224,130,0.2));
+            border-left: 6px solid #ffb300;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        ">
+            <h3 style="color:#ff9800; margin-bottom:15px;">⚠️ Debilidades + Amenazas</h3>
+            <p style="font-size:1.05em; line-height:1.6; color:#333;">
+                Evidencian la necesidad de un <strong>marco de gobernanza institucional</strong> para la IA,
+                con indicadores de impacto, lineamientos éticos y fortalecimiento docente permanente 
+                frente al rápido avance tecnológico.
+            </p>
+        </div>
+
+        <!-- Insight 3 -->
+        <div style="
+            background: linear-gradient(135deg, rgba(30,58,138,0.1), rgba(79,129,255,0.2));
+            border-left: 6px solid #1e3a8a;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        ">
+            <h3 style="color:#1e3a8a; margin-bottom:15px;">🚀 Proyección Estratégica</h3>
+            <p style="font-size:1.05em; line-height:1.6; color:#333;">
+                La combinación de fortalezas y oportunidades consolida un 
+                <strong>modelo de innovación educativa sostenible</strong>, 
+                donde Ingeniería de Software y MCV actúan como eje articulador 
+                para impulsar la transformación digital de todos los programas académicos.
+            </p>
+        </div>
+    </div>
+        </div>
+
+        <!-- Slide 9: Recomendaciones -->
+
+    
+
+
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+                <span class="slide-counter">9 / 16</span>
+            </div>
+            <h1>📋 Apuestas Institucionales</h1>
+            <div class="recommendations">
+                <div class="recommendation-card">
+                    <div class="recommendation-number">1</div>
+                    <p>Impulsar una <strong>Estrategia Institucional de la Innovación con</strong> IA</p>
+                </div>
+                <div class="recommendation-card">
+                    <div class="recommendation-number">2</div>
+                    <p>Seguir <strong>fortaleciendo la formación para profesores y administrativos </strong> en competencias digitales avanzadas</p>
+                </div>
+                <div class="recommendation-card">
+                    <div class="recommendation-number">3</div>
+                    <p>Integrar <strong>la IA en los procesos Curriculares y de Evaluación</strong></p>
+                </div>
+                <div class="recommendation-card">
+                    <div class="recommendation-number">4</div>
+                    <p>Fomentar proyectos <strong>interdisciplinarios y de impacto social </strong> con IA</p>
+                </div>
+                 <div class="recommendation-card">
+                    <div class="recommendation-number">4</div>
+                    <p>Articular IA en los diferentes procesos Administrativos</p>
+                </div>
+            </div>
+            <p style="font-size: 1.2em; margin-bottom: 30px;"> <strong>Usos educativos de la Inteligencia Artificial en la FUMC</strong>:</p>
+            <div class="pill-container">
+                <span class="pill">📚 Diseño de clases asistido por IA</span>
+                <span class="pill">📝 Automatización de retroalimentación</span>
+                <span class="pill">🏥 Simulación de escenarios clínicos</span>
+                <span class="pill">📊 Análisis de datos e investigación</span>
+                <span class="pill">💬 Chatbots y asistentes virtuales</span>
+            </div>
+        </div>
+
+         <!-- Slide 12: Usos Clave --> 
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+                <span class="slide-counter">12 / 16</span>
+            </div>
+            <h1>🔑 Conclusiones Clave</h1>
+            <div class="highlight-box">
+                <h3 style="margin-top: 0; color: #1e3a8a;">🏥 Programas de Salud</h3>
+                <p>Fisioterapia, Fonoaudiología, Terapia Ocupacional, Psicología y Nutrición y Dietética aplican la IA <strong>en la práctica clínica, la simulación de casos, la búsqueda y análisis de evidencia científica, y la creación de materiales educativos interactivos.Se destacan herramientas como ChatGPT, Canva AI, Complete Anatomy, SciSpace, Gemini y PRAAT, empleadas en la generación de recursos didácticos, estudios de caso, y análisis de voz, lenguaje y movimiento, promoviendo el aprendizaje basado en evidencia y la formación integral del estudiante en entornos simulados y reales.</strong></p>
+            </div>
+            <div class="highlight-box" style="background: linear-gradient(135deg, rgba(233, 30, 99, 0.1), rgba(255, 192, 203, 0.2)); border-left-color: #e91e63;">
+                <h3 style="margin-top: 0; color: #e91e63;">💼 Ciencias Empresariales</h3>
+                <p>Administración y Contaduría utilizan la IA en <strong>en la toma de decisiones estratégicas, análisis financiero y desarrollo de competencias gerenciales. Se utilizan plataformas como Power BI, Copilot y ChatGPT para la automatización de cálculos financieros, la generación de informes, simulaciones de casos empresariales, y la formulación de ideas de negocio. Estas estrategias potencian la eficiencia en la gestión y el pensamiento analítico en contextos reales del entorno económico y contable.</strong>.</p>
+            </div>
+            <div class="highlight-box" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.1), rgba(37, 99, 235, 0.2)); border-left-color: #1e3a8a;">
+                <h3 style="margin-top: 0; color: #1e3a8a;">💻 Ingeniería de Software</h3>
+                <p>Aplica la IA en <strong>la programación, el diseño de sistemas expertos y la analítica de datos, promoviendo soluciones inteligentes orientadas a la eficiencia y la innovación tecnológica. Las estrategias se centran en la automatización de procesos académicos, el desarrollo de sistemas inteligentes y la integración de hardware y software para resolver problemas reales. Se destacan proyectos con Tinkercad, NotebookLM y ChatGPT en asignaturas como Sistemas Expertos, Inteligencia Artificial y Modelación y Simulación, fortaleciendo el aprendizaje práctico, la innovación y el pensamiento computacional aplicado.</strong></p>
+            </div>
+        </div>
+
+         <!-- Slide 13: Estrategias Destacadas 1 -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+                <span class="slide-counter">13 / 16</span>
+            </div>
+            <h1>🧩 Estrategias Destacadas</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                <div>
+                   <h2 style="font-size: 1.4em;">💼 Administración</h2>
+                    <ul style="font-size: 0.9em;">
+                        <li>Generación de ideas de negocio y modelos Canvas con ChatGPT y Copilot.</li>
+                        <li>Uso de IA en análisis contable, diseño de hojas de vida y toma de decisiones.</li>
+                        <li>Implementación de Power BI con IA para visualización de datos e inventarios.</li>
+                        <li>Uso de Gemini y Copilot para análisis geopolítico, estudios de caso y diseño de procedimientos ISO.</li>
+                        <li>Aplicación de IWeaver y Google Sites para creación de flujogramas, códigos QR y páginas web.</li>
+                    </ul>
+                    <h2 style="font-size: 1.4em; margin-top: 25px;">🧬 Contaduría Pública</h2>
+                    <ul style="font-size: 0.9em;">
+                        <li>Uso de IA para análisis normativo, simulaciones de nómina, interpretación tributaria y comparación de indicadores financieros.</li>
+                        <li>Integración de ChatGPT y Copilot para análisis de estados financieros, generación de reportes contables y validación de resultados.</li>
+                        <li>Empleo de IA en la creación de materiales de aprendizaje: crucigramas, presentaciones y estudios de caso.</li>
+                        <li>Validación de resultados IA con criterio profesional y revisión docente para fortalecer el pensamiento crítico.</li>
+                    </ul>
+                </div>
+                <div>
+                     <h2 style="font-size: 1.4em;">💻 Ingeniería de Software</h2>
+                    <ul style="font-size: 0.9em;">
+                        <li>Uso transversal de NotebookLM para síntesis de información y aprendizaje autónomo.</li>
+                        <li>Aplicación de Tinkercad y ChatGPT para prototipado, simulación de procesos y depuración de código asistida por IA.</li>
+                        <li>Desarrollo de sistemas expertos y agentes inteligentes en proyectos de IA aplicada.</li>
+                        <li>Implementación de IA en bases de datos, bodegas de datos y gestión TIC para búsqueda de recursos libres y análisis automatizado.</li>
+                        <li>Aplicación transversal de IA en proyectos de aula, integrando generación de contenidos, análisis automatizado y evaluación con rúbricas inteligentes.</li>
+                        <li>Formación en prompts engineering y ética en el uso responsable de la inteligencia artificial.</li>
+                    </ul>
+                    <h2 style="font-size: 1.4em; margin-top: 25px;">🧠 Psicología</h2>
+                    <ul style="font-size: 0.9em;">
+                        <li>Diseño de materiales y recursos didácticos con herramientas como ChatGPT-5, Gamma, Consensus y notebooks digitales, aplicadas en presentaciones, rúbricas y análisis de casos.</li>
+                        <li>Uso de IA para la generación y análisis de casos clínicos y situaciones de entrevista, fortaleciendo el aprendizaje aplicado y la reflexión profesional.</li>
+                        <li>Elaboración de estudios de caso y materiales de apoyo multimedia (podcasts, infografías y esquemas) a partir de fuentes académicas.</li>
+                        <li>Síntesis y organización de información compleja, mediante herramientas de IA para facilitar la comprensión de temas teóricos y clínicos.</li>
+                        <li>Búsqueda y análisis de evidencia científica orientada al desarrollo de pensamiento crítico y competencias investigativas.</li>
+                    </ul>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Estrategias Destacadas 2 -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+                <span class="slide-counter">14 / 16</span>
+            </div>
+            <h1>🏥 Estrategias Destacadas</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                <div>
+                    <h2 style="font-size: 1.4em;">🩺 Fisioterapia</h2>
+                    <ul style="font-size: 0.9em;">
+                        <li>Uso de ChatGPT, Gemini y Copilot para búsqueda de evidencia científica, creación de casos clínicos y síntesis de información biomédica.</li>
+                        <li>Aplicación de herramientas como Tinkercad, Filmora, CapCut y Gamma.app para diseño de presentaciones, videos y simuladores de práctica clínica.</li>
+                        <li>Integración de IA en análisis de riesgos biomecánicos, rehabilitación, tele-rehabilitación y generación de reportes automatizados.</li>
+                        <li>Empleo de software QGIS, Google Maps y Docus AI para georreferenciación, análisis de movimiento y correlación clínica.</li>
+                        <li>Desarrollo de material educativo interactivo (quiz, videos, cartillas) con Canva, Fliki y Pictory.</li>
+                    </ul>
+                    <h2 style="font-size: 1.4em; margin-top: 20px;">🧑⚕️ Terapia Ocupacional</h2>
+                    <ul style="font-size: 0.9em;">
+                        <li>Diseño de prompts para objetivos terapéuticos y simulación de casos clínicos.</li>
+                        <li>Creación de bancos de actividades terapéuticas, recursos artísticos y presentaciones dinámicas con IA.</li>
+                        <li>Uso de IA para simulación de procesos de intervención y evaluación del desempeño funcional.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.4em;">🔊 Fonoaudiología</h2>
+                    <ul style="font-size: 0.9em;">
+                        <li>Uso de herramientas IA (OperaVOX, PRAAT, SONIC Visualiser) para análisis acústico de voz y habla.</li>
+                        <li>Implementación de Canva, Miro, Gamma, Quizziz y Magic Studio para diseño de recursos visuales, presentaciones y materiales didácticos.</li>
+                        <li>Aplicación de IA en simulación de casos clínicos y generación de portafolios profesionales.</li>
+                        <li>Uso de Khanmigo y ChatGPT como tutores personalizados para fortalecer la comprensión y la comunicación oral.</li>
+                        <li>Integración de modelos de simplificación de texto y análisis semántico (WordNet, NLTK) en comprensión lectora y lingüística.</li>
+                    </ul>
+                    <h2 style="font-size: 1.4em; margin-top: 20px;">🥗 Nutrición</h2>
+                    <ul style="font-size: 0.9em;">
+                        <li>Uso de ChatGPT, Gemini y Napkin para rastreo de evidencia científica, generación de imágenes y presentaciones.</li>
+                        <li>Creación de casos, juegos y preguntas tipo ICFES con IA.</li>
+                        <li>Uso de IA para formular preguntas críticas, construir materiales de repaso y organizar contenidos personalizados.</li>
+                        <li>Lineamientos de uso ético y pedagógico de IA implementados en todas las asignaturas.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+         <!-- Slide 14: Estrategias Destacadas 2 -->
+        <div class="slide">
+    <div class="header">
+        <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+        <span class="slide-counter">15 / 16</span>
+    </div>
+    <h1>🏛️ Estrategias Destacadas</h1>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+        <div>
+            <h2 style="font-size: 1.4em;">🧠 Bienestar Institucional</h2>
+            <ul style="font-size: 0.9em;">
+                <li>Implementación del <strong>Taller Psicopedagógico de IA</strong> como estrategia de acompañamiento académico para todos los programas y semestres.</li>
+                <li>Promueve el uso consciente y educativo de la IA para fortalecer el aprendizaje autónomo, la autorregulación emocional y el pensamiento crítico.</li>
+                <li>Cada docente puede agendar el taller con la Coordinación de Desarrollo Humano para adaptarlo a las necesidades de su curso.</li>
+            </ul>
+
+            <h2 style="font-size: 1.4em; margin-top: 20px;">🚀 Innovación y Emprendimiento</h2>
+            <ul style="font-size: 0.9em;">
+                <li><strong>Taller de Creación de Contenido con IA:</strong> fomenta la creatividad mediante herramientas generativas para diseñar textos, imágenes y campañas.</li>
+                <li><strong>IA para la Vida:</strong> promueve la alfabetización digital y el uso responsable de la IA en el estudio, el trabajo y la comunicación cotidiana.</li>
+                <li><strong>Taller de Empleabilidad como Emprendedor con IA:</strong> fortalece el perfil profesional desde el pensamiento innovador y emprendedor.</li>
+            </ul>
+        </div>
+
+        <div>
+            <h2 style="font-size: 1.4em;">📚 Biblioteca</h2>
+            <ul style="font-size: 0.9em;">
+                <li>Lidera la estrategia <strong>IA & Prompts</strong> enfocada en el desarrollo de competencias investigativas y redacción académica asistida por IA.</li>
+                <li>El taller enseña a formular prompts efectivos para optimizar la búsqueda, síntesis y análisis de información científica.</li>
+                <li>Se oferta semestralmente y está disponible para todos los programas académicos, promoviendo un uso ético y crítico de la IA.</li>
+            </ul>
+
+            <h2 style="font-size: 1.4em; margin-top: 20px;">🔬 Investigación</h2>
+            <ul style="font-size: 0.9em;">
+                <li>Desarrolla <strong>webinars y talleres</strong> sobre fundamentos, herramientas y aplicaciones de la IA generativa en investigación y desarrollo tecnológico (I+D+i).</li>
+                <li>Implementa un <strong>Repositorio Institucional de IA</strong> con materiales de aprendizaje, guías, artículos científicos, normas internacionales y recursos éticos sobre IA.</li>
+                <li>Fortalece la gestión del conocimiento y la producción científica, posicionando la IA como eje transversal de la innovación institucional.</li>
+            </ul>
+        </div>
+    </div>
+        </div>
+
+         <!-- Slide 14: Estrategias Destacadas 2 -->
+        <div class="slide">
+    <div class="header">
+        <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+        <span class="slide-counter">15 / 16</span>
+    </div>
+    <h1>🏛️ Estrategias Destacadas</h1>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+        <div>
+            <h2 style="font-size: 1.4em;">👩‍🏫 Asesores Pedagógicos</h2>
+            <ul style="font-size: 0.9em;">
+                <li><strong>Diseño de rúbricas inteligentes con ChatGPT:</strong> utilización de IA generativa para estructurar criterios de evaluación coherentes con los resultados de aprendizaje, mejorar la redacción de descriptores y optimizar la retroalimentación formativa.</li>
+                <li><strong>Implementación de plataformas Irubric y Rubrika potenciadas con IA:</strong> estas herramientas aplican algoritmos de análisis automático para verificar consistencia, redundancia y nivel de desempeño en las rúbricas, facilitando una evaluación más objetiva y precisa.</li>
+                <li><strong>Gamificación evaluativa con Mentimeter y Padlet asistidos por IA:</strong> empleo de analítica algorítmica para interpretar respuestas en tiempo real, generar visualizaciones interactivas y medir participación estudiantil como insumo para la retroalimentación.</li>
+            </ul>
+        </div>
+        <div>
+            <ul style="font-size: 0.9em; margin-top: 38px;">
+                <li><strong>Análisis automatizado de resultados con Google Sheets y Excel (Copilot):</strong> aplicación de funciones inteligentes basadas en IA para identificar tendencias, generar visualizaciones dinámicas y construir informes de desempeño académico.</li>
+                <li><strong>Desarrollo de simuladores educativos con Skywork.ai integrados a Moodle:</strong> uso de IA generativa para crear entornos virtuales interactivos que replican situaciones reales de enseñanza y permiten al estudiante aprender por experimentación.</li>
+              
+            </ul>
+        </div>
+          
+    </div>
+ <div style="margin-top: 50px; padding: 35px; background: linear-gradient(135deg, rgba(233, 30, 99, 0.1), rgba(76, 175, 80, 0.1)); border-radius: 20px; text-align: center; border: 3px solid #e91e63;">
+    <div style="font-size: 3em; margin-bottom: 10px;">💡</div>
+    <p style="font-size: 1.1em; color: #333; max-width: 850px; margin: 0 auto;">
+        Estas estrategias consolidan un <strong>modelo pedagógico apoyado en IA</strong>, que integra automatización, analítica educativa y creatividad docente para fortalecer la calidad formativa y la innovación institucional.
+    </p>
+</div>
+        </div>
+
+<!-- Ia generativa para la docencia-->
+<div class="slide">
+    <div class="header">
+        <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+        <span class="slide-counter">10 / 16</span>
+    </div>
+
+        <h1>Módulos</h1>
+    <div class="modules-container">
+
+        <!-- Módulo 1 -->
+        <div class="module-card module-3">
+            <h2>MÓDULO 1</h2>
+            <h3>Introducción (20 minutos)</h3>
+
+            <ul>
+                <li><strong>a)</strong> Bienvenida al programa: objetivos y metodología</li>
+                <li><strong>b)</strong> Guía de navegación: cómo aprovechar al máximo el autoestudio</li>
+                <li><strong>c)</strong> El arte de conversar con la IA para obtener lo que necesitas.</li>
+                <li><strong>d)</strong> Evaluación diagnóstica: nivel de conocimiento previo en previo en IA</li>
+                <li><strong>e)</strong> ¿Por qué un docente debe dominar las IA generativas?</li>
+            </ul>
+        </div>
+
+        <!-- Módulo 2 -->
+        <div class="module-card module-4">
+            <h2>MÓDULO 2</h2>
+            <h3>Fundamentos de IA generativa (20 minutos)</h3>
+
+            <ul>
+                <li><strong>a)</strong> Conceptos clave y evolución</li>
+                <li><strong>b)</strong> Tipos de modelos existentes</li>
+                <li><strong>c)</strong> Uso responsable de IA para generar contenidos</li>
+                <li><strong>d)</strong> ¿Cómo funcionan los modelos de lenguaje?</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div class="slide">
+    <div class="header">
+        <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+        <span class="slide-counter">10 / 16</span>
+    </div>
+
+        <h1>Módulos</h1>
+    <div class="modules-container">
+
+        <!-- Módulo 3 -->
+        <div class="module-card module-3">
+            <h2>MÓDULO 3</h2>
+            <h3>IA generativa para la docencia (45 minutos)</h3>
+
+            <ul>
+                <li><strong>a)</strong> Creación de contenido: ChatGPT, Gemini y Copilot (otros)</li>
+                <li><strong>b)</strong> Diseño de actividades evaluativas y de aprendizaje</li>
+                <li><strong>c)</strong> Adaptación de contenidos a distintos niveles de aprendizaje</li>
+                <li><strong>d)</strong> Diseño de lecciones completas con IA</li>
+                <li><strong>e)</strong> Gamificación del aula</li>
+                <li><strong>f)</strong> ¿Qué es la instrucción avanzada? (prompting avanzado)</li>
+            </ul>
+        </div>
+
+        <!-- Módulo 4 -->
+        <div class="module-card module-4">
+            <h2>MÓDULO 4</h2>
+            <h3>Casos prácticos para docencia con IA (30 minutos)</h3>
+
+            <ul>
+                <li><strong>a)</strong> Creación de historietas con voces personalizadas</li>
+                <li><strong>b)</strong> Redacción asistida para generar una guía didáctica</li>
+                <li><strong>c)</strong> Creación de un cuestionario para evaluación</li>
+                <li><strong>d)</strong> Generación de narraciones para un podcast educativo</li>
+                <li><strong>e)</strong> Experiencia inmersiva: Chicharrón</li>
+                <li><strong>f)</strong> Generación de un mapa conceptual</li>
+                <li><strong>g)</strong> Creación de presentación de diapositivas</li>
+                <li><strong>h)</strong> Vídeo: Bebé insatisfecho</li>
+                <li><strong>i)</strong> Imagen: Tu foto como cómic</li>
+            </ul>
+        </div>
+
+   
+     
+     </div>
+
+</div>
+
+<div class="slide">
+    <div class="header">
+        <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" 
+             alt="Logo María Cano" class="logo">
+        <span class="slide-counter">11 / 16</span>
+    </div>
+
+    <h1>Módulo</h1>
+
+    <div class="final-module-card">
+        <div class="final-module-content">
+            
+            <div class="final-text">
+                <h2>🎓 MÓDULO 5 — Entrega Final</h2>
+                <p>
+                    Este módulo marca la finalización del curso. 
+                    Los participantes desarrollarán un producto integrador aplicando 
+                    todos los conceptos de IA generativa aprendidos.
+                </p>
+            </div>
+
+            <div class="final-icon">
+                <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" 
+                     alt="Finalización del curso">
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="slide">
+     <div class="header">
+        <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" 
+             alt="Logo María Cano" class="logo">
+        <span class="slide-counter">11 / 16</span>
+    </div>
+     <h1>Gamificación y Aprendizaje Interactivo</h1>
+<div class="game-image-container">
+    <img src="code-logic.png" alt="CodeLogic Quest Preview" class="game-image">
+</div>
+</div>
+
+<div class="slide">
+    <div class="header">
+        <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" 
+             alt="Logo María Cano" class="logo">
+        <span class="slide-counter">13 / 16</span>
+    </div>
+
+    <h1>🌟 El Aula de las Maravillas (Formación)</h1>
+
+    <div class="wonder-classroom">
+        <div class="mosaic-grid">
+            <img src="aula1.jpg" alt="CodeLogic Quest Preview" class="game-image" alt="Imagen 1">
+            <img src="aula2.jpg" alt="CodeLogic Quest Preview" class="game-image" alt="Imagen 2">
+            <img src="aula3.jpg" alt="CodeLogic Quest Preview" class="game-image" alt="Imagen 3">
+            <img src="aula4.jpg" alt="CodeLogic Quest Preview" class="game-image" alt="Imagen 4">
+        </div>
+    </div>
+</div>
+
+<!-- fin-->
+
+        
+
+        <!-- Slide 10: Conclusiones -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/logoMariaCano.png" alt="Logo María Cano" class="logo">
+                <span class="slide-counter">16 / 16</span>
+            </div>
+            <h1>🎓 Conclusiones</h1>
+            <div class="highlight-box">
+                <ul style="font-size: 1.15em; line-height: 2;">
+                    <li>✅ La documentación de estas 133 experiencias de IA representa evidencia directa de <strong> innovación pedagógica, transformación digital y mejora continua, </strong> dimensiones valoradas en procesos de <strong>acreditación de alta calidad.</strong></li>
+                    <li>✅ La presencia de múltiples estrategias en diferentes sedes y modalidades muestra una <strong>cultura de experimentación y apropiación tecnológica</strong> enseñanza, evaluación e investigación</li>
+                    <li>✅ Se requiere <strong>gobernanza institucional</strong> por parte del profesorado.Este movimiento espontáneo constituye una base sólida para crear redes interprogramáticas de innovación con IA.</li>
+                    <li> La IA se ha convertido en un catalizador de cambio en la práctica docente y en la formación estudiantil.
+                     El siguiente paso es fortalecer una <strong>cultura institucional de innovación sostenible</strong>, basada en la colaboración interdisciplinaria y la evaluación del impacto educativo.</li>
+                </ul>
+            </div>
+            <div style="margin-top: 50px; padding: 35px; background: linear-gradient(135deg, rgba(233, 30, 99, 0.1), rgba(76, 175, 80, 0.1)); border-radius: 20px; text-align: center; border: 3px solid #e91e63;">
+                <h2 style="color: #e91e63; margin-bottom: 20px;">💡 Mensaje Final</h2>
+                <p style="font-size: 1.4em; font-weight: 600; color: #1e3a8a; line-height: 1.6;">La IA no reemplaza la enseñanza humana; <span style="color: #e91e63;">la potencia</span>.</p>
+                <p style="font-size: 1.2em; margin-top: 20px; color: #333;">La Fundación Universitaria María Cano está preparada para ser <strong style="color: #4caf50;">referente nacional</strong> en innovación educativa con IA, integrando tecnología, ética y humanismo.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-prev" onclick="previousSlide()">← Anterior</button>
+        <button class="btn btn-next" onclick="nextSlide()">Siguiente →</button>
+    </div>
+
+    <script>
+        // Crear partículas animadas en el fondo
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.querySelector('.btn-prev');
+        const nextBtn = document.querySelector('.btn-next');
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+            
+            // Animar las barras cuando se muestra la slide
+            setTimeout(() => {
+                const barFills = slides[currentSlide].querySelectorAll('.bar-fill');
+                barFills.forEach(bar => {
+                    const targetWidth = bar.getAttribute('data-width') || '100';
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = targetWidth + '%';
+                    }, 200);
+                });
+            }, 100);
+            
+            updateButtons();
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function updateButtons() {
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        // Inicializar barras en la primera slide
+        setTimeout(() => {
+            const barFills = slides[0].querySelectorAll('.bar-fill');
+            barFills.forEach(bar => {
+                const targetWidth = bar.getAttribute('data-width') || '100';
+                bar.style.width = targetWidth + '%';
+            });
+        }, 500);
+
+        updateButtons();
+    </script>
+</body>
+</html>
+    <div class="presentation-container">
+        <!-- Slide 1: Portada -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/2023/01/logo-fumc.png" alt="Logo María Cano" class="logo">
+                <span class="slide-number">2 / 10</span>
+            </div>
+            <h1>Integración de la Inteligencia Artificial</h1>
+            <p class="subtitle">Fundación Universitaria María Cano</p>
+            <div class="stats-grid" style="margin-top: 50px;">
+                <div class="stat-card">
+                    <span class="stat-number">133</span>
+                    <span class="stat-label">Estrategias Registradas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">24</span>
+                    <span class="stat-label">Programas Participantes</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">2025</span>
+                    <span class="stat-label">Año de Medición</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Introducción -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/2023/01/logo-fumc.png" alt="Logo María Cano" class="logo">
+                <span class="slide-number">2 / 10</span>
+            </div>
+            <h1>📘 Introducción</h1>
+            <div class="highlight-box">
+                <p>La Inteligencia Artificial (IA) se ha convertido en un <strong>eje estratégico de innovación</strong> en los programas académicos de la Fundación Universitaria María Cano.</p>
+            </div>
+            <p>Este informe presenta los <strong>resultados reales</strong> de las estrategias de incorporación de IA registradas en 2025, incluyendo su impacto en:</p>
+            <div class="pill-container">
+                <span class="pill">🎓 Docencia</span>
+                <span class="pill">🔬 Investigación</span>
+                <span class="pill">🏛️ Gestión Institucional</span>
+            </div>
+        </div>
+
+
+        <!-- Slide 4: Distribución por Programa -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/2023/01/logo-fumc.png" alt="Logo María Cano" class="logo">
+                <span class="slide-number">4 / 10</span>
+            </div>
+            <h1>📈 Distribución de Estrategias</h1>
+            <div class="chart-container">
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <span class="bar-label">Fisioterapia Neiva</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: 100%;">15</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label">Fonoaudiología Neiva</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: 100%;">15</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label">Fisioterapia Cali</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: 80%;">12</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label">Fisioterapia Popayán</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: 73%;">11</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label">Psicología / Ing. Software</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: 60%;">9</div>
+                        </div>
+                    </div>
+                    <div class="bar-item">
+                        <span class="bar-label">Contaduría / Fonoaud. Med.</span>
+                        <div class="bar">
+                            <div class="bar-fill" style="width: 47%;">7</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Participación Institucional -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/2023/01/logo-fumc.png" alt="Logo María Cano" class="logo">
+                <span class="slide-number">5 / 10</span>
+            </div>
+            <h1>🎯 Participación Institucional</h1>
+            <div class="stats-grid">
+                <div class="stat-card" style="background: linear-gradient(135deg, #4caf50, #66bb6a);">
+                    <span class="stat-number">66%</span>
+                    <span class="stat-label">Experiencias Activas</span>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #ff9800, #fb8c00);">
+                    <span class="stat-number">34%</span>
+                    <span class="stat-label">En Exploración</span>
+                </div>
+            </div>
+            <h2>Grado de Madurez Institucional</h2>
+            <table>
+                <tr>
+                    <th>Nivel</th>
+                    <th>Descripción</th>
+                    <th>Porcentaje</th>
+                </tr>
+                <tr>
+                    <td><strong>Inicial</strong></td>
+                    <td>Exploración del uso de herramientas IA</td>
+                    <td><strong>38%</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Intermedio</strong></td>
+                    <td>Integración formal en clases y prácticas</td>
+                    <td><strong>47%</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Avanzado</strong></td>
+                    <td>Estrategias replicables e institucionales</td>
+                    <td><strong>15%</strong></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Slide 6: Tipología de Uso -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/2023/01/logo-fumc.png" alt="Logo María Cano" class="logo">
+                <span class="slide-number">6 / 10</span>
+            </div>
+            <h1>🔧 Tipología de Uso de la IA</h1>
+            <table>
+                <tr>
+                    <th>Tipo de Uso</th>
+                    <th>Descripción</th>
+                    <th>Programasxcsde</th>
+                </tr>
+                <tr>
+                    <td><strong>Docencia Asistida</strong></td>
+                    <td>ChatGPT, Copilot y Gemini para diseño de clases</td>
+                    <td>Ingeniería, Psicología</td>
+                </tr>
+                <tr>
+                    <td><strong>Práctica Profesional</strong></td>
+                    <td>Simulaciones y análisis de casos</td>
+                    <td>Fisioterapia, Fonoaudiología</td>
+                </tr>
+                <tr>
+                    <td><strong>Evaluación Automatizada</strong></td>
+                    <td>Rúbrica y retroalimentación automática</td>
+                    <td>Ingeniería, Psicología</td>
+                </tr>
+                <tr>
+                    <td><strong>Investigación Aplicada</strong></td>
+                    <td>Modelos predictivos y análisis de datos</td>
+                    <td>Ingeniería, Innovación</td>
+                </tr>
+            </table>
+        </div>
+
+        
+
+        <!-- Slide 8: Fortalezas y Desafíos -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/2023/01/logo-fumc.png" alt="Logo María Cano" class="logo">
+                <span class="slide-number">8 / 10</span>
+            </div>
+            <h1>⚖️ Fortalezas y Desafíos</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h2 style="color: #4caf50;">✅ Fortalezas</h2>
+                    <ul>
+                        <li>Alta participación docente</li>
+                        <li>Liderazgo de Ingeniería de Software</li>
+                        <li>Expansión a sedes regionales</li>
+                        <li>Motivación institucional</li>
+                    </ul>
+                    <h2 style="color: #4caf50; margin-top: 30px;">🚀 Oportunidades</h2>
+                    <ul>
+                        <li>Observatorio de IA Educativa</li>
+                        <li>IA en acreditación</li>
+                        <li>Diplomado docente en IA</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 style="color: #ff9800;">⚠️ Debilidades</h2>
+                    <ul>
+                        <li>Desigualdad entre programas</li>
+                        <li>Falta de lineamientos éticos</li>
+                        <li>Escasa medición de impacto</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Recomendaciones -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/2023/01/logo-fumc.png" alt="Logo María Cano" class="logo">
+                <span class="slide-number">9 / 10</span>
+            </div>
+            <h1>📋 Recomendaciones Institucionales</h1>
+            <div class="recommendations">
+                <div class="recommendation-card">
+                    <div class="recommendation-number">1</div>
+                    <p>Formalizar una <strong>Política de Uso Ético y Educativo</strong> de la IA</p>
+                </div>
+                <div class="recommendation-card">
+                    <div class="recommendation-number">2</div>
+                    <p>Establecer <strong>formatos estandarizados</strong> de reporte de estrategias</p>
+                </div>
+                <div class="recommendation-card">
+                    <div class="recommendation-number">3</div>
+                    <p>Consolidar <strong>Ingeniería de Software</strong> como programa ancla</p>
+                </div>
+                <div class="recommendation-card">
+                    <div class="recommendation-number">4</div>
+                    <p>Crear un <strong>Observatorio de Innovación</strong> con IA</p>
+                </div>
+                <div class="recommendation-card">
+                    <div class="recommendation-number">5</div>
+                    <p>Incluir <strong>indicadores IA</strong> en acreditación y PEI</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Conclusiones -->
+        <div class="slide">
+            <div class="header">
+                <img src="https://www.fumc.edu.co/wp-content/uploads/2023/01/logo-fumc.png" alt="Logo María Cano" class="logo">
+                <span class="slide-number">10 / 10</span>
+            </div>
+            <h1>🎓 Conclusiones</h1>
+            <div class="highlight-box">
+                <ul>
+                    <li>✅ <strong>133 estrategias reales</strong> de integración de IA</li>
+                    <li>✅ <strong>Ingeniería de Software</strong>: programa más maduro tecnológicamente</li>
+                    <li>✅ La IA está <strong>transformando</strong> enseñanza, evaluación e investigación</li>
+                    <li>✅ Se requiere <strong>gobernanza institucional</strong> de la IA educativa</li>
+                </ul>
+            </div>
+            <div class="warning-box" style="margin-top: 40px; text-align: center; border-left: none; border: 3px solid #e91e63;">
+                <h2 style="color: #e91e63; margin-top: 0;">💡 Mensaje Final</h2>
+                <p style="font-size: 1.3em; font-weight: 500;">La IA no reemplaza la enseñanza humana; <strong>la potencia</strong>.</p>
+                <p style="font-size: 1.2em;">La Fundación Universitaria María Cano está preparada para ser <strong>referente nacional</strong> en innovación educativa con IA, integrando tecnología, ética y humanismo.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-prev" onclick="previousSlide()">← Anterior</button>
+        <button class="btn btn-next" onclick="nextSlide()">Siguiente →</button>
+    </div>
+
+    <script>
+        
+         // Crear partículas animadas en el fondo
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+        particlesContainer.appendChild(particle);
+    }
+
+    // Variables globales
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.querySelector('.btn-prev');
+    const nextBtn = document.querySelector('.btn-next');
+
+    // Mostrar slide actual
+    function showSlide(n) {
+        slides.forEach(s => s.classList.remove('active'));
+        currentSlide = (n + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+
+        // Animar barras si existen
+        const barFills = slides[currentSlide].querySelectorAll('.bar-fill');
+        barFills.forEach(bar => {
+            const targetWidth = bar.getAttribute('data-width') || '100';
+            bar.style.width = '0%';
+            setTimeout(() => bar.style.width = targetWidth + '%', 200);
+        });
+
+        updateButtons();
+    }
+
+    // Botones
+    function nextSlide() {
+        if (currentSlide < slides.length - 1) showSlide(currentSlide + 1);
+    }
+
+    function previousSlide() {
+        if (currentSlide > 0) showSlide(currentSlide - 1);
+    }
+
+    function updateButtons() {
+        prevBtn.disabled = currentSlide === 0;
+        nextBtn.disabled = currentSlide === slides.length - 1;
+    }
+
+    // Navegación con teclado
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight') nextSlide();
+        if (e.key === 'ArrowLeft') previousSlide();
+    });
+
+    // 🚀 Esperar a que el DOM cargue antes de activar el primer slide
+    window.addEventListener('DOMContentLoaded', () => {
+        showSlide(0); // activa el primer slide
+    });
+    </script>
+</body>
+</html>
